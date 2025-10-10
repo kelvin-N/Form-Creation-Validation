@@ -23,9 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Email validation
-    if (!email.includes("@") || !email.includes(".")) {
+    const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    if (!emailPattern.test(email)) {
       isValid = false;
-      messages.push("Please enter a valid email address (must include '@' and '.').");
+      messages.push("Please enter a valid email address.");
     }
 
     // Password validation

@@ -5,77 +5,76 @@ document.addEventListener("DOMContentLoaded", function () {
   const taskInput = document.getElementById("task-input");
   const taskList = document.getElementById("task-list");
 
-  // Load tasks from Local Storage when the page loads
+  // In-memory tasks array (single source of truth)
+  let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+  // Load tasks from Local Storage into the DOM
   loadTasks();
 
-  // Function to load tasks from Local Storage
+  // Function: loadTasks - reads from localStorage (via tasks) and populates the DOM
   function loadTasks() {
-    const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    storedTasks.forEach((taskText) => {
-      const li = document.createElement("li");
-      li.textContent = taskText;
-
-      const removeButton = document.createElement("button");
-      removeButton.textContent = "Remove";
-      removeButton.classList.add("remove-btn");
-
-      removeButton.onclick = function () {
-        taskList.removeChild(li);
-        removeTask(taskText);
-      };
-
-      li.appendChild(removeButton);
-      taskList.appendChild(li);
+    // tasks already initialized from localStorage above
+    tasks.forEach((taskText) => {
+      addTask(taskText, false); // false => don't save again to Local Storage
     });
   }
 
-  // Function to remove a task and update Local Storage
-  function removeTask(taskText) {
-    const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    const updatedTasks = storedTasks.filter((task) => task !== taskText);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-  }
+  // Function: addTask
+  // If taskText param is provided it will use that value; otherwise it reads from input.
+  // save === true means update tasks array + localStorage.
+  function addTask(taskTextParam, save = true) {
+    const taskText = typeof taskTextParam === "string"
+      ? taskTextParam.trim()
+      : taskInput.value.trim();
 
-  // Create the addTask Function
-  function addTask() {
-    const taskText = taskInput.value.trim();
-
-    // Check if taskText is empty
+    // Validate
     if (taskText === "") {
-      alert("Please enter a task!");
+      // Only alert when user attempted to add via input/button (i.e., no param provided)
+      if (taskTextParam === undefined) {
+        alert("Please enter a task!");
+      }
       return;
     }
 
-    // Create new li element
+    // Create list item
     const li = document.createElement("li");
     li.textContent = taskText;
 
-    // Create Remove button
+    // Create remove button
     const removeButton = document.createElement("button");
     removeButton.textContent = "Remove";
-    removeButton.classList.add("remove-btn");
+    removeButton.classList.add("remove-btn"); // use classList.add as required
 
-    // Assign onclick event to remove button
+    // Remove handler: remove from DOM and update tasks + localStorage
     removeButton.onclick = function () {
       taskList.removeChild(li);
       removeTask(taskText);
     };
 
-    // Append remove button to li, then li to task list
+    // Append and (optionally) save
     li.appendChild(removeButton);
     taskList.appendChild(li);
 
-    // Save to Local Storage
-    const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    storedTasks.push(taskText);
-    localStorage.setItem("tasks", JSON.stringify(storedTasks));
+    if (save) {
+      tasks.push(taskText);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      taskInput.value = ""; // clear input only when user added
+    }
+  }
 
-    // Clear input field
-    taskInput.value = "";
+  // Function: removeTask - remove first matching occurrence and update localStorage
+  function removeTask(taskText) {
+    const index = tasks.indexOf(taskText);
+    if (index > -1) {
+      tasks.splice(index, 1); // remove one occurrence
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
   }
 
   // Attach Event Listeners
-  addButton.addEventListener("click", addTask);
+  addButton.addEventListener("click", function () {
+    addTask(); // reads from input and saves
+  });
 
   taskInput.addEventListener("keypress", function (event) {
     if (event.key === "Enter") {

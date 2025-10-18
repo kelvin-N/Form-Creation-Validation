@@ -1,49 +1,48 @@
+// Setup Event Listener for Page Load
 document.addEventListener("DOMContentLoaded", function () {
-  // Select form and feedback div
-  const form = document.getElementById("registration-form");
-  const feedbackDiv = document.getElementById("form-feedback");
+  // Select DOM Elements
+  const addButton = document.getElementById("add-task-btn");
+  const taskInput = document.getElementById("task-input");
+  const taskList = document.getElementById("task-list");
 
-  // Add submit event listener
-  form.addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent form submission
+  // Create the addTask Function
+  function addTask() {
+    const taskText = taskInput.value.trim();
 
-    // Retrieve and trim inputs
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    // Initialize validation variables
-    let isValid = true;
-    const messages = [];
-
-    // Username validation
-    if (username.length < 3) {
-      isValid = false;
-      messages.push("Username must be at least 3 characters long.");
+    // Check if taskText is empty
+    if (taskText === "") {
+      alert("Please enter a task!");
+      return;
     }
 
-    // Email validation
-    const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
-    if (!emailPattern.test(email)) {
-      isValid = false;
-      messages.push("Please enter a valid email address.");
-    }
+    // Create new li element
+    const li = document.createElement("li");
+    li.textContent = taskText;
 
-    // Password validation
-    if (password.length < 8) {
-      isValid = false;
-      messages.push("Password must be at least 8 characters long.");
-    }
+    // Create Remove button
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.classList.add("remove-btn"); // ✅ uses classList.add
 
-    // Display feedback
-    feedbackDiv.style.display = "block";
+    // Assign onclick event to remove button
+    removeButton.onclick = function () {
+      taskList.removeChild(li);
+    };
 
-    if (isValid) {
-      feedbackDiv.textContent = "Registration successful!";
-      feedbackDiv.style.color = "#28a745";
-    } else {
-      feedbackDiv.innerHTML = messages.join("<br>");
-      feedbackDiv.style.color = "#dc3545";
+    // Append remove button to li, then li to task list
+    li.appendChild(removeButton);
+    taskList.appendChild(li);
+
+    // Clear input field
+    taskInput.value = "";
+  }
+
+  // Attach Event Listeners
+  addButton.addEventListener("click", addTask);
+
+  taskInput.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+      addTask();
     }
   });
 });

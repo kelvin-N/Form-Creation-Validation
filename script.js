@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Select the form
+  // Form selection
   const form = document.getElementById("registration-form");
 
-  // Select the feedback div
-  const feedbackDiv = document.getElementById("feedback");
+  // Feedback div selection (ALX EXPECTS THIS ID)
+  const feedbackDiv = document.getElementById("form-feedback");
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       messages.push("Password must be at least 8 characters long.");
     }
 
-    // Feedback display logic
+    // Feedback display logic (STRICT ALX RULES)
     feedbackDiv.style.display = "block";
 
     if (isValid) {
